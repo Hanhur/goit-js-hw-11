@@ -1,3 +1,5 @@
+import SimpleLightbox from 'simplelightbox';
+
 let searchQueryResult = '';
 let q = '';
 let pageN = 1;
@@ -131,3 +133,5 @@ catch (error) {
 console.log("btnLoadMore working");
 console.log("");
 });
+
+export {searchForm, btnLoadMore};

@@ -1,9 +1,8 @@
 import './sass/index.scss';
 import { Notify } from 'notiflix';
 const axios = require('axios').default;
-import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import Forms from './js/form.js';
+import { searchForm, btnLoadMore } from './js/form';
 
 // -------------------------------------------------------------------------------------------------------
 const pixabayAPI = {
