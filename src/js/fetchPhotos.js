@@ -1,2 +1,0 @@
-// fetch photos function
-
