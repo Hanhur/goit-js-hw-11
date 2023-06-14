@@ -1,8 +1,6 @@
 // fetch photos function
 const axios = require("axios").default;
-import { Notify } from "notiflix";
-
-export async function fetchPhotos(searchQueryResult) 
+async function fetchPhotos(searchQueryResult) 
 {
     const {
         baseUrl,
