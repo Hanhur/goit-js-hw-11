@@ -2,7 +2,7 @@ import './sass/index.scss';
 import { Notify } from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { fetchPhotos, renderedPhotos } from './js/photo';
+import { fetchPhotos, renderedPhotos } from './js/photo.js';
 
 // -------------------------------------------------------------------------------------------------------
 //let variables
@@ -12,25 +12,6 @@ let q = '';
 let pageN = 1;
 let gallery = new SimpleLightbox('.gallery a', {enableKeyboard: true, });
 
-
-//Objects
-
-//pixabayObj
-
-const pixabayAPI = {
-
-        baseUrl: 'https://pixabay.com/api/',
-        key: '3705719-850a353db1ffe60c326d386e6',
-        image_type: "photo",
-        orientation: "horizontal",
-        safesearch: "true",
-        order: "popular",
-        page: '1',
-        per_page: "40",
-
-};
-    
-//markup
 
 const markupData = {
     markup: "",

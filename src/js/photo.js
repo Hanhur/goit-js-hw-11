@@ -1,6 +1,19 @@
 // fetch photos function
 const axios = require('axios').default;
 
+const pixabayAPI = {
+
+  baseUrl: 'https://pixabay.com/api/',
+  key: '3705719-850a353db1ffe60c326d386e6',
+  image_type: "photo",
+  orientation: "horizontal",
+  safesearch: "true",
+  order: "popular",
+  page: '1',
+  per_page: "40",
+
+};
+
 async function fetchPhotos(searchQueryResult) {
 
     const { baseUrl, key, image_type, orientation, safesearch, order, page, per_page } = pixabayAPI;
