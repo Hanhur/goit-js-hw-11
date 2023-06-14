@@ -2,7 +2,7 @@
 const axios = require("axios").default;
 import { Notify } from "notiflix";
 
-export async function fetchPhotos(searchQueryResult) 
+async function fetchPhotos(searchQueryResult) 
 {
     const {
         baseUrl,
@@ -52,7 +52,7 @@ export async function fetchPhotos(searchQueryResult)
 
 // render photos function, make html markup
 
-export async function renderedPhotos(results) 
+async function renderedPhotos(results) 
 {
     const { hits } = results;
 
