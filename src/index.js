@@ -6,17 +6,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import Forms from './js/form';
 
 // -------------------------------------------------------------------------------------------------------
-//let variables
-
-let searchQueryResult = '';
-let q = '';
-let pageN = 1;
-let gallery = new SimpleLightbox('.gallery a', { /* options */enableKeyboard: true, });
-
-
-//Objects
-
-//pixabayObj
 
 const pixabayAPI = {
 

@@ -1,4 +1,9 @@
 // event listener search form
+let searchQueryResult = '';
+let q = '';
+let pageN = 1;
+let gallery = new SimpleLightbox('.gallery a', { /* options */enableKeyboard: true, });
+
 const searchForm = document.querySelector('.search-form');
 searchForm.addEventListener("submit", async (e) => {
 
