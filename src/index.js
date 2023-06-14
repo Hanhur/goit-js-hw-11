@@ -2,7 +2,7 @@ import "./sass/index.scss";
 import SimpleLightbox from "simplelightbox";
 import { Notify } from "notiflix";
 import "simplelightbox/dist/simple-lightbox.min.css";
-import {fetchPhotos} from './js/fetchPhotos';
+import Photos from './js/fetchPhotos';
 
 //===========================================================================================================
 //let variables
