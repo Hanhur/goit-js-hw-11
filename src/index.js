@@ -38,24 +38,25 @@ const gallerySelector = document.querySelector(".gallery");
 
 // event listener search form
 
-searchForm.addEventListener("submit", async e => {
+searchForm.addEventListener("submit", async (e) => {
+
     e.preventDefault();
 
     const { elements: { searchQuery } } = e.target;
-
+    
     searchQueryResult = searchQuery.value;
 
-    console.log("searchQueryResult:", `"${searchQueryResult}"`);
+    console.log("searchQueryResult:",`"${searchQueryResult}"`);
     console.log("q:", `"${q}"`);
-
-    if (searchQueryResult === "") 
+    
+    if (searchQueryResult === '') 
     {
         console.log(searchQueryResult);
         gallerySelector.innerHTML = "";
         btnLoadMore.classList.remove("is-visible");
-
-        return Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-    }
+        
+        return Notify.failure('Sorry, there are no images matching your search query. Please try again.');          
+    };
 
     if (searchQueryResult !== q) 
     {
@@ -73,12 +74,12 @@ searchForm.addEventListener("submit", async e => {
 
         pageN += 1;
         pixabayAPI.page = `${pageN}`;
-
+        
         btnLoadMore.classList.remove("is-visible");
-    }
-
+    };
+    
     q = searchQueryResult;
-
+    
     try 
     {
         const results = await fetchPhotos(searchQueryResult);
@@ -86,76 +87,56 @@ searchForm.addEventListener("submit", async e => {
 
         gallerySelector.insertAdjacentHTML("beforeend", markupData.htmlCode);
         btnLoadMore.classList.add("is-visible");
-
+        
         // simpleLightbox gallery destroys and reinitilized
         gallery.refresh();
-
-        const {
-            baseUrl,
-            key,
-            image_type,
-            orientation,
-            safesearch,
-            order,
-            page,
-            per_page
-        } = pixabayAPI;
-        const { total, totalHits, hits } = results;
+        
+        const { baseUrl, key, image_type, orientation, safesearch, order, page, per_page } = pixabayAPI;
+        const { total, totalHits, hits } = results;    
         const totalPages = Math.ceil(totalHits / per_page);
-
+             
         if (page >= totalPages) 
-        {
+        {       
             btnLoadMore.classList.remove("is-visible");
-        }
+        };
         Notify.success(`'Hooray! We found ${results.totalHits} images.'`);
-
         console.log("results", results);
-    } 
-    catch (error) 
-    {
-        Notify.failure("Sorry, there are no images matching your search query. Please try again.");
     }
+    catch (error) 
+    {   
+        Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    };
     console.log("");
 });
 
-const btnLoadMore = document.querySelector(".load-more");
+const btnLoadMore = document.querySelector('.load-more');
 btnLoadMore.addEventListener("click", async () => {
-    pageN += 1;
-    pixabayAPI.page = `${pageN}`;
+        pageN += 1;
+        pixabayAPI.page = `${pageN}`;
 
     try 
     {
         const results = await fetchPhotos(searchQueryResult);
         markupData.htmlCode = await renderedPhotos(results);
-
+        
         gallerySelector.insertAdjacentHTML("beforeend", markupData.htmlCode);
         btnLoadMore.classList.add("is-visible");
-
+        
         // simpleLightbox gallery destroys and reinitilized
         gallery.refresh();
 
-        const {
-            baseUrl,
-            key,
-            image_type,
-            orientation,
-            safesearch,
-            order,
-            page,
-            per_page
-        } = pixabayAPI;
-        const { total, totalHits, hits } = results;
+        const { baseUrl, key, image_type, orientation, safesearch, order, page, per_page } = pixabayAPI;
+        const { total, totalHits, hits } = results;    
         const totalPages = Math.ceil(totalHits / per_page);
-
+        
         if (page >= totalPages) 
-        {
+        {          
             btnLoadMore.classList.remove("is-visible");
-        }
-
+        };
         console.log("results", results);
-    } 
+    }
     catch (error) 
-    {
+    {   
         Notify.failure("We're sorry, but you've reached the end of search results.");
     }
     console.log("btnLoadMore working");
