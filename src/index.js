@@ -34,7 +34,7 @@ const markupData = {
 // searchForm and gallery find in DOM
 const searchForm = document.querySelector(".search-form");
 const gallerySelector = document.querySelector(".gallery");
-const btnLoadMore = document.querySelector(".load-more");
+
 
 // event listener search form
 
@@ -118,6 +118,7 @@ searchForm.addEventListener("submit", async e => {
     console.log("");
 });
 
+const btnLoadMore = document.querySelector(".load-more");
 btnLoadMore.addEventListener("click", async () => {
     pageN += 1;
     pixabayAPI.page = `${pageN}`;
