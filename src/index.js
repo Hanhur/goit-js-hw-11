@@ -1,209 +1,107 @@
-import './sass/index.scss';
-import { Notify } from 'notiflix';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import { fetchPhotos } from './js/photo';
-// -------------------------------------------------------------------------------------------------------
-//let variables
+import Notify from 'notiflix';
+import { gallery, btnLoadMore, searchForm } from './js/refs.js';
+import ApiService from './js/apiService.js';
+import { renderPhotoCard } from './js/photoCard.js';
 
-let searchQueryResult = '';
-let q = '';
-let pageN = 1;
-let gallery = new SimpleLightbox('.gallery a', { /* options */enableKeyboard: true, });
+const imageApiService = new ApiService();
 
+searchForm.addEventListener('submit', onSearch);
+btnLoadMore.addEventListener('click', onBtnLoadMore);
 
-//Objects
+async function onSearch(event) 
+{
+    try 
+    {
+        event.preventDefault();
+        cleanGallery();
 
-//pixabayObj
+        const searchQuery = event.currentTarget.elements.searchQuery.value.trim();
 
-const pixabayAPI = {
+        if (!searchQuery) 
+        {
+            Notify.Notify.warning('Please type something to search.');
+            isHiddenBtnLoadMore();
+            return;
+        }
 
-        baseUrl: 'https://pixabay.com/api/',
-        key: '3705719-850a353db1ffe60c326d386e6',
-        image_type: "photo",
-        orientation: "horizontal",
-        safesearch: "true",
-        order: "popular",
-        page: '1',
-        per_page: "40",
+        imageApiService.query = searchQuery;
+        imageApiService.page = 1;
+        imageApiService.hits = 0;
 
-};
-    
-//markup
+        event.currentTarget.reset();
+        const data = await imageApiService.fetchImage();
+        if (data.hits.length == 0) 
+        {
+            Notify.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+            isHiddenBtnLoadMore();
+            return;
+        }
 
-const markupData = {
-    markup: "",
-    htmlCode: "",
-};
+        renderPhotoCard(data);
+        visibleBtnLoadMore();
+        btnLoadMore.disabled = false;
 
-// -------------------------------------------------------------------------------------------------------
-// searchForm and gallery find in DOM
-
-const searchForm = document.querySelector('.search-form');
-const gallerySelector = document.querySelector('.gallery');
-
-// -------------------------------------------------------------------------------------------------------
-// event listener search form
-
-searchForm.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const { elements: { searchQuery } } = e.target;
-    
-    searchQueryResult = searchQuery.value;
-
-
-    // console.log
-    console.log("searchQueryResult:",`"${searchQueryResult}"`);
-    console.log("q:", `"${q}"`);
-    
-    if (searchQueryResult === '') {
-        console.log(searchQueryResult);
-        gallerySelector.innerHTML = "";
-        btnLoadMore.classList.remove("is-visible");
-        
-        return Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-            
-    };
-
-    if (searchQueryResult !== q) {
-
-        console.log("CHANGED!!! NOT EMPTY QUERY");
-
-        pageN = 1;
-        pixabayAPI.page = `${pageN}`;
-
-        gallerySelector.innerHTML = "";
-        btnLoadMore.classList.remove("is-visible");
-
-    } else {
-
-        console.log("page+1!!!");
-
-        pageN += 1;
-        pixabayAPI.page = `${pageN}`;
-        
-        btnLoadMore.classList.remove("is-visible");
-
-    };
-    
-    q = searchQueryResult;
-    
-    try {
-
-        const results = await fetchPhotos(searchQueryResult);
-        markupData.htmlCode = await renderedPhotos(results);
-
-        gallerySelector.insertAdjacentHTML("beforeend", markupData.htmlCode);
-        btnLoadMore.classList.add("is-visible");
-        
-        // simpleLightbox gallery destroys and reinitilized
-        gallery.refresh();
-        
-        
-
-        const { baseUrl, key, image_type, orientation, safesearch, order, page, per_page } = pixabayAPI;
-        const { total, totalHits, hits } = results;    
-        const totalPages = Math.ceil(totalHits / per_page);
-        
-        
-        if (page >= totalPages) {
-        
-        btnLoadMore.classList.remove("is-visible");
-
-        };
-
-        Notify.success(`'Hooray! We found ${results.totalHits} images.'`);
-
-        //console.log
-        console.log("results", results);
-
+        Notify.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    } 
+    catch (error) 
+    {
+        console.log('error', error);
     }
+}
 
-    catch (error) {
-    
-        Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+function cleanGallery() 
+{
+    gallery.innerHTML = '';
+}
 
-    };
+function visibleBtnLoadMore() 
+{
+    btnLoadMore.classList.remove('is-hidden');
+    btnLoadMore.classList.add('visible');
+}
 
-    // console.log
-    console.log("");
-});
+function isHiddenBtnLoadMore() 
+{
+    btnLoadMore.classList.add('is-hidden');
+    btnLoadMore.classList.remove('visible');
+}
 
-// -------------------------------------------------------------------------------------------------------
-// button load more
+async function onBtnLoadMore() 
+{
+    try 
+    {
+        const data = await imageApiService.fetchImage();
+        if (data.hits.length == 0) 
+        {
+            Notify.Notify.info("We're sorry, but you've reached the end of search results.");
+            btnLoadMore.disabled = true;
+            return;
+        }
+        if (imageApiService.hits > imageApiService.totalHits) 
+        {
+            Notify.Notify.info("We're sorry, but you've reached the end of search results.");
+            btnLoadMore.disabled = true;
+            return;
+        }
+        renderPhotoCard(data);
+        pageScrolling();
 
-const btnLoadMore = document.querySelector('.load-more');
-btnLoadMore.addEventListener("click", async () => {
-
-        pageN += 1;
-        pixabayAPI.page = `${pageN}`;
-
-try {
-
-        const results = await fetchPhotos(searchQueryResult);
-        markupData.htmlCode = await renderedPhotos(results);
-        
-        gallerySelector.insertAdjacentHTML("beforeend", markupData.htmlCode);
-        btnLoadMore.classList.add("is-visible");
-        
-        // simpleLightbox gallery destroys and reinitilized
-        gallery.refresh();
-
-        const { baseUrl, key, image_type, orientation, safesearch, order, page, per_page } = pixabayAPI;
-        const { total, totalHits, hits } = results;    
-        const totalPages = Math.ceil(totalHits / per_page);
-        
-    if (page >= totalPages) {
-            
-            btnLoadMore.classList.remove("is-visible");
-        };
-
-        console.log("results", results);
-
+        imageApiService.hits += 40;
+    } 
+    catch (error) 
+    {
+        console.log('error', error);
     }
+}
 
-    catch (error) {
-    
-        Notify.failure("We're sorry, but you've reached the end of search results.");
+function pageScrolling() 
+{
+    const { height: cardHeight } = document
+        .querySelector('.gallery')
+        .firstElementChild.getBoundingClientRect();
 
-    }
-
-    console.log("btnLoadMore working");
-    console.log("");
-});
-
-// -------------------------------------------------------------------------------------------------------
-// render photos function, make html markup
-
-async function renderedPhotos(results) {
-
-    const { hits } = results;
-
-    markupData.markup = hits.map((hit) =>
-        `<a href="${hit.largeImageURL}"><div class="photo-card">
-        <img src="${hit.webformatURL}" alt="${hit.tags}" loading="lazy"
-          class="img-item" />
-        <div class="info">
-    <p class="info-item">
-      <b>Likes:</b>${hit.likes}
-    </p>
-    <p class="info-item">
-      <b>Views:</b>${hit.views}
-    </p>
-    <p class="info-item">
-      <b>Comments:</b>${hit.comments}
-    </p>
-    <p class="info-item">
-      <b>Downloads:</b>${hit.downloads}
-    </p>
-  </div>
-</div></a>`).join("");
-    
-    return markupData.markup;
-    
-};
-
-
-// ---------------------------------------------------------
+    window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+    });
+}
